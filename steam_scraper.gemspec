@@ -24,6 +24,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'nokogiri', '~> 1.6.8'
   spec.add_development_dependency 'httparty', '~> 0.14.0'
+  spec.add_development_dependency 'parallel', '~> 1.9.0'
+  spec.add_development_dependency 'ruby-progressbar', '~> 1.8.1'
+  spec.add_runtime_dependency 'ruby-progressbar', '~> 1.8.1'
+  spec.add_runtime_dependency 'parallel', '~> 1.9.0'
   spec.add_runtime_dependency 'nokogiri', '~> 1.6.8'
   spec.add_runtime_dependency 'httparty', '~> 0.14.0'
 end

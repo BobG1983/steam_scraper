@@ -1,5 +1,5 @@
 require_relative './page_retriever.rb'
-
+require 'parallel'
 # Core scraping class
 class GameListScraper
   def initialize(*_args)
@@ -27,19 +27,21 @@ class GameListScraper
   def scrape(first_page = 1, last_page = nil)
     last_page ||= @last_page_num
     # scrape each search page
-    puts 'Scraping Steam Store pages ' + [first_page..last_page].join(' to ')
-    (first_page..last_page).each do |page|
-      puts 'Scraping Page ' + page.to_s
+    result = Parallel.map(first_page..last_page,
+                          progress: 'Scraping Steam Store pages ' + [first_page..last_page].join(' to ')) do |page|
       items_on_page = search_results(page)
       scrape_page(items_on_page)
     end
-    @game_list
+    @game_list.push(result).flatten!
   end
 
   def scrape_page(current_page)
+    entries = []
     current_page.each do |entry|
-      scrape_entry(entry)
+      entries.push(scrape_entry(entry))
     end
+
+    entries
   end
 
   def scrape_url(entry)
@@ -65,7 +67,6 @@ class GameListScraper
     begin
       date = Date.parse(date_node_text)
     rescue ArgumentError
-      puts 'Invalid date found.  Probably in the future.  Date set to nil'
     end
 
     date
@@ -119,6 +120,6 @@ class GameListScraper
     new_game[:icon_url] = scrape_icon_url(entry)
     new_game[:review_score] = scrape_review_score(entry)
     new_game[:number_of_reviews] = scrape_number_of_reviews(entry)
-    @game_list.push new_game
+    new_game
   end
 end

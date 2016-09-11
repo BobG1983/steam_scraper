@@ -1,4 +1,5 @@
 require_relative './page_retriever.rb'
+require 'Parallel'
 
 # Class that scrapes a games actual page
 class GamePageScraper
@@ -7,16 +8,21 @@ class GamePageScraper
   end
 
   def scrape(games_hash)
-    games_hash.map! do |game|
+    result = Parallel.map(games_hash, progress: 'Scraping additional per game data') do |game|
       url = game[:url]
-      scrape_game!(game, url) unless url.nil?
+      scrape_game(game, url) unless url.nil?
     end
-    games_hash
+    games_hash.push(result).flatten!
   end
 
-  def scrape_game!(game, url)
-    puts 'Scraping additional data for ' + game[:name]
+  def scrape_game(game, url)
     page_contents = get_page_contents(url)
+    game = scrape_game_with_valid_contents(game, page_contents) unless page_contents.nil?
+
+    game
+  end
+
+  def scrape_game_with_valid_contents(game, page_contents)
     game[:metacritic] = scrape_metacritic(page_contents)
     game[:tags] = scrape_tags(page_contents)
     game[:genres] = scrape_genres(page_contents)
