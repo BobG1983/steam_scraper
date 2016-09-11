@@ -68,6 +68,9 @@ class GamePageScraper
 
   def scrape_min_spec(page_contents)
     spec_block = page_contents.xpath("//div[@data-os='win']/div[@class='game_area_sys_req_leftCol']/ul/ul")
+    if spec_block.empty?
+      spec_block = page_contents.xpath("//div[@data-os='win']/div[@class='game_area_sys_req_full']/ul/ul")
+    end
     scrape_spec(spec_block)
   end
 
