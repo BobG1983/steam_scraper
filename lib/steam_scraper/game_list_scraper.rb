@@ -81,6 +81,7 @@ class GameListScraper
 
   def get_review_contents(entry)
     node = entry.xpath(".//span[contains(@class, 'search_review_summary')]")
+    result = nil
     result = node.attribute('data-store-tooltip').value unless node.nil?
 
     result
