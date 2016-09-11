@@ -1,0 +1,11 @@
+Style/IfUnlessModifier:
+  MaxLineLength: 120
+
+Style/WhileUntilModifier:
+  MaxLineLength: 120
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/AbcSize:
+  Max: 99999
