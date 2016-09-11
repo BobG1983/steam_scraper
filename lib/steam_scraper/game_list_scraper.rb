@@ -80,9 +80,10 @@ class GameListScraper
   end
 
   def get_review_contents(entry)
-    entry.xpath(".//span[contains(@class, 'search_review_summary')]")
-         .attribute('data-store-tooltip')
-         .value
+    node = entry.xpath(".//span[contains(@class, 'search_review_summary')]")
+    result = node.attribute('data-store-tooltip').value unless node.nil?
+
+    result
   end
 
   def scrape_review_score(entry)
