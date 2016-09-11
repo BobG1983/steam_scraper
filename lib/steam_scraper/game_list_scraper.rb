@@ -30,7 +30,7 @@ class GameListScraper
     puts 'Scraping Steam Store pages ' + [first_page..last_page].join(' to ')
     (first_page..last_page).each do |page|
       puts 'Scraping Page ' + page.to_s
-      items_on_page = search_results(site + page.to_s)
+      items_on_page = search_results(page)
       scrape_page(items_on_page)
       puts 'Page Complete'
     end
