@@ -21,14 +21,14 @@ Or install it yourself as:
 To scrape all pages from the steam store:
 
 ```Ruby
-scraper = SteamScraper.new
+scraper = SteamScraper::SteamScraper.new
 results = scraper.scrape
 ```
 
 To scrape a range of pages from the steam store:
 
 ```Ruby
-scraper = SteamScraper.new
+scraper = SteamScraper::SteamScraper.new
 results = scraper.scrape(first_page, last_page)
 ```
 
