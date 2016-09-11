@@ -15,7 +15,7 @@ class GamePageScraper
   end
 
   def scrape_game!(game, url)
-    puts 'Scraping Page for ' + game[:name]
+    puts 'Scraping additional data for ' + game[:name]
     page_contents = get_page_contents(url)
     game[:metacritic] = scrape_metacritic(page_contents)
     game[:tags] = scrape_tags(page_contents)
@@ -84,6 +84,7 @@ class GamePageScraper
     spec_hash = {}
     spec_array.each do |entry|
       value_pair = entry.split(':')
+      next if value_pair.first.nil?
       key = value_pair.first.to_sym
       value = value_pair.last.strip
       spec_hash[key] = value

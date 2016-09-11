@@ -32,9 +32,7 @@ class GameListScraper
       puts 'Scraping Page ' + page.to_s
       items_on_page = search_results(page)
       scrape_page(items_on_page)
-      puts 'Page Complete'
     end
-    puts 'Scraping Complete'
     @game_list
   end
 
@@ -62,7 +60,15 @@ class GameListScraper
   end
 
   def scrape_release_date(entry)
-    Date.parse(entry.xpath(".//div[contains(@class, 'search_released')]").text)
+    date_node_text = entry.xpath(".//div[contains(@class, 'search_released')]").text
+    date = nil
+    begin
+      date = Date.parse(date_node_text)
+    rescue ArgumentError
+      puts 'Invalid date found.  Probably in the future.  Date set to nil'
+    end
+
+    date
   end
 
   def scrape_platforms(entry)
@@ -82,7 +88,7 @@ class GameListScraper
   def get_review_contents(entry)
     node = entry.xpath(".//span[contains(@class, 'search_review_summary')]")
     result = nil
-    result = node.attribute('data-store-tooltip').value unless node.nil?
+    result = node.attribute('data-store-tooltip').value unless node.empty?
 
     result
   end
