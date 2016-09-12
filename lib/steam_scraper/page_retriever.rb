@@ -1,5 +1,5 @@
 # Retrieves a URL and return the Nokogiri representation of that page
-require 'HTTParty'
+require 'httparty'
 require 'nokogiri'
 
 # Class for retrieving a Nokogiri tree from a URL
