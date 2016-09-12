@@ -13,6 +13,7 @@ module SteamScraper
 
     def scrape(first_page = 1, last_page = nil)
       scraped_game_list = @game_list_scraper.scrape(first_page, last_page)
+      puts 'Initial scrape complete.  Found ' + scraped_game_list.length.to_s + ' games.'
       final_game_list = @game_page_scraper.scrape(scraped_game_list)
 
       final_game_list

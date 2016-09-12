@@ -5,10 +5,16 @@ class GameListScraper
   def initialize(*_args)
     @game_list = []
     @page_retriever = PageRetriever.new
+    init_last_page_num
+  end
+
+  def init_last_page_num
     current_page_contents = get_page_contents(site + 1.to_s)
-    pagination_contents = current_page_contents.xpath("//div[contains(@class, 'search_pagination_right')]") .text
-    last_page_number = pagination_contents.scan(/(\d+)/i) .flatten.last
-    @last_page_num = last_page_number.to_i
+    @last_page_num = current_page_contents.xpath("//div[contains(@class, 'search_pagination_right')]")
+                                          .text.scan(/(\d+)/i).flatten.last.to_i
+  rescue StandardError => e
+    puts 'Could not connect to Steam Store'
+    raise e
   end
 
   def site
@@ -22,13 +28,15 @@ class GameListScraper
   def search_results(page_number)
     current_page_contents = get_page_contents(site + page_number.to_s)
     current_page_contents.xpath("//div[@id='search_result_container']/div/a")
+  rescue
+    nil
   end
 
   def scrape(first_page = 1, last_page = nil)
     last_page ||= @last_page_num
-    # scrape each search page
     result = Parallel.map(first_page..last_page,
-                          progress: 'Scraping Steam Store pages ' + [first_page..last_page].join(' to ')) do |page|
+                          progress: 'Scraping Steam Store pages ' + [first_page..last_page].join(' to '),
+                          in_processes: 8) do |page|
       items_on_page = search_results(page)
       scrape_page(items_on_page)
     end
@@ -40,7 +48,6 @@ class GameListScraper
     current_page.each do |entry|
       entries.push(scrape_entry(entry))
     end
-
     entries
   end
 
@@ -54,22 +61,13 @@ class GameListScraper
 
   def scrape_price(entry)
     entry.xpath(".//div[contains(@class, 'search_price')
-                and not(contains(@class, 'search_price_discount_combined'))]")
-         .text
-         .strip
-         .split('$')
-         .last
+                and not(contains(@class, 'search_price_discount_combined'))]").text.strip.split('$').last
   end
 
   def scrape_release_date(entry)
-    date_node_text = entry.xpath(".//div[contains(@class, 'search_released')]").text
-    date = nil
-    begin
-      date = Date.parse(date_node_text)
-    rescue ArgumentError
-    end
-
-    date
+    Date.parse(entry.xpath(".//div[contains(@class, 'search_released')]").text)
+  rescue
+    nil
   end
 
   def scrape_platforms(entry)
@@ -78,7 +76,6 @@ class GameListScraper
     platforms.push('macOS') unless entry.xpath(".//span[contains(@class, 'mac')]").empty?
     platforms.push('Linux') unless entry.xpath(".//span[contains(@class, 'linux')]").empty?
     platforms.push('Steamplay') unless entry.xpath(".//span[contains(@class, 'steamplay')]").empty?
-
     platforms
   end
 
@@ -90,7 +87,6 @@ class GameListScraper
     node = entry.xpath(".//span[contains(@class, 'search_review_summary')]")
     result = nil
     result = node.attribute('data-store-tooltip').value unless node.empty?
-
     result
   end
 
@@ -98,7 +94,6 @@ class GameListScraper
     review_string = get_review_contents(entry)
     matches = /.*(\d\d)[%]/i.match(review_string)
     review_percentage = matches[1] unless matches.nil?
-
     review_percentage
   end
 
@@ -106,7 +101,6 @@ class GameListScraper
     review_string = get_review_contents(entry)
     matches = /.*\d\d[%] of the ([0-9,]*) user/i.match(review_string)
     num_reviews = matches[1] unless matches.nil?
-
     num_reviews
   end
 

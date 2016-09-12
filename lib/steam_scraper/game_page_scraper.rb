@@ -8,7 +8,9 @@ class GamePageScraper
   end
 
   def scrape(games_hash)
-    result = Parallel.map(games_hash, progress: 'Scraping additional per game data') do |game|
+    result = Parallel.map(games_hash,
+                          progress: 'Scraping additional per game data',
+                          in_processes: 8) do |game|
       url = game[:url]
       scrape_game(game, url) unless url.nil?
     end

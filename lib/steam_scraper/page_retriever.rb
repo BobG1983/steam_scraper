@@ -7,8 +7,7 @@ class PageRetriever
   def retrieve(url)
     page_contents = HTTParty.get(url)
     Nokogiri::HTML(page_contents)
-  rescue Error => e
-    puts e
+  rescue
     nil
   end
 end
