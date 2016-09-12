@@ -1,5 +1,5 @@
 require_relative './page_retriever.rb'
-require 'Parallel'
+require 'parallel'
 
 # Class that scrapes a games actual page
 class GamePageScraper
