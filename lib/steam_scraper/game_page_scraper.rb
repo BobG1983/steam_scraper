@@ -89,11 +89,12 @@ class GamePageScraper
 
   def scrape_spec(node)
     spec_array = node.text.split "\r"
+    spec_array = node.text.split "\n" if spec_array.length == 1
     spec_hash = {}
     spec_array.each do |entry|
       value_pair = entry.split(':')
       next if value_pair.first.nil?
-      key = value_pair.first.to_sym
+      key = value_pair.first.strip.to_sym
       value = value_pair.last.strip
       spec_hash[key] = value
     end
